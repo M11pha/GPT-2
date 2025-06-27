@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import tiktoken
 from MultiHead_Attention import MultiHeadAttention
-
+from FlashAttention import FlashAttention
 
 class LayerNorm(nn.Module):
     def __init__(self, emb_dim):
@@ -52,6 +52,13 @@ class TransformerBlock(nn.Module):
             num_heads=cfg["n_heads"],
             dropout=cfg["drop_rate"],
             qkv_bias=cfg["qkv_bias"])
+        # self.att = FlashAttention(
+        #     d_in=cfg["emb_dim"],
+        #     d_out=cfg["emb_dim"],
+        #     context_length=cfg["context_length"],
+        #     num_heads=cfg["n_heads"],
+        #     dropout=cfg["drop_rate"],
+        #     qkv_bias=cfg["qkv_bias"])
         self.ff = FeedForward(cfg)
         self.norm1 = LayerNorm(cfg["emb_dim"])
         self.norm2 = LayerNorm(cfg["emb_dim"])

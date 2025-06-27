@@ -8,10 +8,11 @@ class GPTDatasetV1(Dataset):
     def __init__(self, txt, tokenizer, max_length, stride):
         self.input_ids = []
         self.target_ids = []
-
+        # print(f"len of txt: {len(txt)}")
         # Tokenize the entire text
         token_ids = tokenizer.encode(txt, allowed_special={"<|endoftext|>"})
-
+        # print(f"len of token_ids: {len(token_ids)}")
+        # print(f"{token_ids[0]}")
         # Use a sliding window to chunk the book into overlapping sequences of max_length
         for i in range(0, len(token_ids) - max_length, stride):
             input_chunk = token_ids[i:i + max_length]
