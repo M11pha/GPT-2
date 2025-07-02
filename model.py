@@ -67,7 +67,14 @@ class TransformerBlock(nn.Module):
     def forward(self, x):
         # Shortcut connection for attention block
         shortcut = x
+
+        # Layer normalization (LayerNorm) is applied before each of these two components,
+        # and dropout is applied after them to regularize the model and prevent overfitting. This
+        # is also known as Pre-LayerNorm. Older architectures, such as the original transformer
+        # model, applied layer normalization after the self-attention and feed forward networks
+        # instead, known as Post-LayerNorm, which often leads to worse training dynamics.
         x = self.norm1(x)
+
         x = self.att(x)   # Shape [batch_size, num_tokens, emb_size]
         x = self.drop_shortcut(x)
         x = x + shortcut  # Add the original input back
