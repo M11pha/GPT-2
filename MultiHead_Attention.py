@@ -5,6 +5,8 @@ import torch.nn as nn
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_in, d_out, context_length, dropout, num_heads, qkv_bias=False):
         super().__init__()
+        # assert <条件表达式>, <可选的错误信息>
+        # 如果表达式的结果为 False，程序会立即停止，并抛出一个 AssertionError 异常，同时会显示在逗号后面提供的错误信息
         assert d_out % num_heads == 0, "d_out must be divisible by n_heads"
 
         self.d_out = d_out
@@ -21,9 +23,9 @@ class MultiHeadAttention(nn.Module):
     def forward(self, x):
         b, num_tokens, d_in = x.shape
 
-        keys = self.W_key(x)  # Shape: (b, num_tokens, d_out)
+        keys    = self.W_key(x)  # Shape: (b, num_tokens, d_out)
         queries = self.W_query(x)
-        values = self.W_value(x)
+        values  = self.W_value(x)
 
         # We implicitly split the matrix by adding a `num_heads` dimension
         # Unroll last dim: (b, num_tokens, d_out) -> (b, num_tokens, num_heads, head_dim)

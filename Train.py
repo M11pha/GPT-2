@@ -19,8 +19,11 @@ else:
         text_data = file.read()
 
 GPT_CONFIG_124M = {
+    # vocab_size refers to a vocabulary of 50,257 words, as used by the BPE tokenizer
     "vocab_size": 50257,   # Vocabulary size
+    # denotes the maximum number of input tokens the model can handle via the positional embeddings
     "context_length": 1024, # Shortened context length (orig: 1024)
+    # emb_dim represents the embedding size, transforming each token into a 768-dimensional vector
     "emb_dim": 768,        # Embedding dimension
     "n_heads": 12,         # Number of attention heads
     "n_layers": 12,        # Number of layers
