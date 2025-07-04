@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import tiktoken
 from MultiHead_Attention import MultiHeadAttention
-from FlashAttention import FlashAttention
+# from FlashAttention import FlashAttention
 
 class LayerNorm(nn.Module):
     def __init__(self, emb_dim):
@@ -43,6 +43,9 @@ class FeedForward(nn.Module):
 
 
 class TransformerBlock(nn.Module):
+    # 参数量 7.1M (7,085,568)
+    # att 2.36M
+    # ff 4.72M
     def __init__(self, cfg):
         super().__init__()
         self.att = MultiHeadAttention(
@@ -96,10 +99,10 @@ class GPTModel(nn.Module):
         self.pos_emb = nn.Embedding(cfg["context_length"], cfg["emb_dim"])
         self.drop_emb = nn.Dropout(cfg["drop_rate"])
 
-        self.trf_blocks = nn.Sequential(
-            *[TransformerBlock(cfg) for _ in range(cfg["n_layers"])])
+        self.trf_blocks = nn.Sequential(*[TransformerBlock(cfg) for _ in range(cfg["n_layers"])])
 
         self.final_norm = LayerNorm(cfg["emb_dim"])
+        # Output layer shape: torch.Size([vocab_size, emb_dim])
         self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False)
 
     def forward(self, in_idx):
@@ -131,8 +134,10 @@ def generate_text_simple(model, idx, max_new_tokens, context_size):
         # (batch, n_token, vocab_size) becomes (batch, vocab_size)
         logits = logits[:, -1, :]
 
+        probas = torch.softmax(logits, dim=-1)
+
         # Get the idx of the vocab entry with the highest logits value
-        idx_next = torch.argmax(logits, dim=-1, keepdim=True)  # (batch, 1)
+        idx_next = torch.argmax(probas, dim=-1, keepdim=True)  # (batch, 1)
 
         # Append sampled index to the running sequence
         idx = torch.cat((idx, idx_next), dim=1)  # (batch, n_tokens+1)
@@ -170,7 +175,7 @@ if __name__ == "__main__":
     out = generate_text_simple(
         model=model,
         idx=encoded_tensor,
-        max_new_tokens=10,
+        max_new_tokens=6,
         context_size=GPT_CONFIG_124M["context_length"]
     )
     decoded_text = tokenizer.decode(out.squeeze(0).tolist())
